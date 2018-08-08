@@ -1,6 +1,9 @@
-var winston = require('winston');
+const winston = require('winston');
+const Discord = require('discord.io');
+const whois = require('whois')
+const auth=require('./auth.json');
 
-var options = {
+const options = {
     file: {
         level: 'info',
         filename: `waterhouse-app.log`,
@@ -18,7 +21,7 @@ var options = {
     },
 };
 
-var logger = winston.createLogger({
+const logger = winston.createLogger({
     transports: [
         new winston.transports.File(options.file),
         new winston.transports.Console(options.console)
@@ -26,26 +29,26 @@ var logger = winston.createLogger({
     exitOnError: false, // do not exit on handled exceptions
 });
 
-var whois = require('whois')
 whois.lookup('google.com', function(err, data) {
     console.log(data)
 })
 
-var Discord = require('discord.io');
 // Initialize Discord Bot
-var auth=require('./auth.json');
 var bot = new Discord.Client({
     token: auth.token,
     autorun: true
 });
+
 bot.on('ready', function() {
     console.log('Logged in as %s - %s\n', bot.username, bot.id);
 });
+
 bot.on('message', function(user, userID, channelID, message, event) {
         var msg = "".concat(user," : ",userID," : ",message);
         logger.info(msg);
         var msgset=message.split(" ");
-if(authz(user,userID) == "member"){
+
+        if(authz(user,userID) == "member"){
         switch(msgset[0])
          {
          case "!help":
@@ -115,7 +118,10 @@ _ _ __ _ __ _ __ _ __ _ __ _ __ _ __ _ __ _ __ _ __ _ __ _ __ _ __ _ __ _ __ _ _
         }
 }
 });
+
+
 // -- Stuff below this line should really go in a library--
+
 function sendmsg(msg,channelID,log=true){
     bot.sendMessage({
         to: channelID,
@@ -263,3 +269,4 @@ bot.on('message', function (user, userID, channelID, message, event) {
      }
 });
 */
+
